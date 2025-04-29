@@ -6,6 +6,9 @@ A Serverless Framework plugin that adds request validation to your AWS API Gatew
 
 ```bash
 npm install --save-dev serverless-api-gateway-request-validator
+
+# Using Serverless plugin install
+serverless plugin install -n serverless-api-gateway-request-validator
 ```
 
 Then add the plugin to your `serverless.yml` file:
