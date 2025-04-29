@@ -1,0 +1,35 @@
+service: example-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+
+plugins:
+  - serverless-api-gateway-request-validator
+
+functions:
+  createUser:
+    handler: handler.createUser
+    events:
+      - http:
+          path: /users
+          method: post
+          request:
+            validator:
+              type: ALL
+            schemas:
+              application/json: ${file(schemas/user.json)}
+
+  getUser:
+    handler: handler.getUser
+    events:
+      - http:
+          path: /users/{id}
+          method: get
+          request:
+            validator:
+              type: PARAMS_ONLY
+            parameters:
+              paths:
+                id: true

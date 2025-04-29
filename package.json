@@ -1,0 +1,23 @@
+{
+  "name": "serverless-api-gateway-request-validator",
+  "version": "1.0.0",
+  "description": "Serverless Framework plugin to configure API Gateway request validators",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "serverless",
+    "aws",
+    "api-gateway",
+    "request-validator",
+    "validation",
+    "schema"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "peerDependencies": {
+    "serverless": "3.40.0"
+  }
+}

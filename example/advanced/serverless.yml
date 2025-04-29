@@ -1,0 +1,66 @@
+service: advanced-api-example
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+
+plugins:
+  - serverless-api-gateway-request-validator
+
+functions:
+  createArticle:
+    handler: handlers/articles.create
+    events:
+      - http:
+          path: /articles
+          method: post
+          request:
+            validator:
+              type: ALL
+            schemas:
+              application/json: ${file(schemas/article.json)}
+
+  updateArticle:
+    handler: handlers/articles.update
+    events:
+      - http:
+          path: /articles/{id}
+          method: put
+          request:
+            validator:
+              type: ALL
+            schemas:
+              application/json: ${file(schemas/article-update.json)}
+            parameters:
+              paths:
+                id: true
+              
+  listArticles:
+    handler: handlers/articles.list
+    events:
+      - http:
+          path: /articles
+          method: get
+          request:
+            validator:
+              type: PARAMS_ONLY
+            parameters:
+              querystrings:
+                page: false
+                limit: false
+                sort: false
+                
+  getArticleById:
+    handler: handlers/articles.get
+    events:
+      - http:
+          path: /articles/{id}
+          method: get
+          request:
+            validator:
+              type: PARAMS_ONLY
+            parameters:
+              paths:
+                id: true
