@@ -1,5 +1,5 @@
 'use strict';
 
-const ApiGatewayRequestValidator = require('./apiGatewayRequestValidator');
+const ApiGatewayRequestValidator = require('./src/apiGatewayRequestValidator');
 
 module.exports = ApiGatewayRequestValidator;

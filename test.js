@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const ApiGatewayRequestValidator = require('./apiGatewayRequestValidator');
+const ApiGatewayRequestValidator = require('./src/apiGatewayRequestValidator');
 
 // Mock Serverless instance
 class MockServerless {
@@ -107,30 +107,6 @@ class MockServerless {
         getStage: () => 'dev'
       };
     };
-
-    // Mock for plugin detection
-    this.pluginManager = {
-      plugins: [{
-        constructor: { name: 'AwsCompileApigEvents' },
-        getMethodIntegration: () => {
-          return {
-            Properties: {
-              Integration: {}
-            }
-          };
-        },
-        compileMethods: function() {
-          return 'Original compile methods called';
-        }
-      }]
-    };
-  }
-}
-
-// Mock plugin class for testing
-class MockAwsCompileApigEvents {
-  constructor() {
-    this.name = 'AwsCompileApigEvents';
   }
 }
 
@@ -146,22 +122,17 @@ function testPluginInitialization() {
   assert(plugin.serverless === serverless, 'Serverless instance should be set');
   assert(plugin.options === options, 'Options should be set');
   console.log('✓ Plugin initialization successful');
+  
+  return plugin;
 }
 
-// Test: Method compilation interceptor
-function testMethodCompilationInterceptor() {
-  const serverless = new MockServerless();
-  const options = {};
-  
-  // Create plugin instance
-  new ApiGatewayRequestValidator(serverless, options);
+// Test: Request validator creation
+function testRequestValidatorCreation(plugin) {
+  // Call the validator creation hook
+  plugin.addRequestValidators();
   
   // Get the compiled template resources
-  const { Resources } = serverless.service.provider.compiledCloudFormationTemplate;
-  
-  // Call the modified compileMethods function
-  const apiGatewayPlugin = serverless.pluginManager.plugins[0];
-  apiGatewayPlugin.compileMethods();
+  const { Resources } = plugin.serverless.service.provider.compiledCloudFormationTemplate;
   
   // Verify created resources
   const requestValidatorKeys = Object.keys(Resources).filter(key => 
@@ -177,7 +148,7 @@ function testMethodCompilationInterceptor() {
   
   assert.strictEqual(modelKeys.length, 1, 'Should create 1 model');
   
-  console.log('✓ Method compilation interceptor is working');
+  console.log('✓ Request validators created successfully');
   
   // Check that parameters are set for the GET endpoint
   const getMethodResource = Resources.ApiGatewayMethodUsersIdGet;
@@ -188,8 +159,8 @@ function testMethodCompilationInterceptor() {
 
 // Run tests
 try {
-  testPluginInitialization();
-  testMethodCompilationInterceptor();
+  const plugin = testPluginInitialization();
+  testRequestValidatorCreation(plugin);
   console.log('All tests passed!');
 } catch (error) {
   console.error('Test failed:', error);
