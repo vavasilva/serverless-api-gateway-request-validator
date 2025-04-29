@@ -1,6 +1,6 @@
 {
   "name": "serverless-api-gateway-request-validator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Serverless Framework plugin to configure API Gateway request validators",
   "main": "src/index.js",
   "scripts": {

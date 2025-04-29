@@ -4,30 +4,37 @@ class ApiGatewayRequestValidator {
   constructor(serverless, options) {
     // Add schema definition for request validator config
     if (serverless.configSchemaHandler) {
-      serverless.configSchemaHandler.defineFunctionEventProperties('aws', 'http', {
-        properties: {
-          request: {
-            type: 'object',
-            properties: {
-              validator: {
-                type: 'object',
-                properties: {
-                  type: { type: 'string', enum: ['ALL', 'BODY_ONLY', 'PARAMS_ONLY'] }
-                }
-              },
-              schemas: { type: 'object' },
-              parameters: {
-                type: 'object',
-                properties: {
-                  paths: { type: 'object' },
-                  querystrings: { type: 'object' },
-                  headers: { type: 'object' }
+      try {
+        serverless.configSchemaHandler.defineFunctionEventProperties('aws', 'http', {
+          properties: {
+            request: {
+              type: 'object',
+              properties: {
+                validator: {
+                  type: 'object',
+                  properties: {
+                    type: { type: 'string', enum: ['ALL', 'BODY_ONLY', 'PARAMS_ONLY'] }
+                  }
+                },
+                schemas: { type: 'object' },
+                parameters: {
+                  type: 'object',
+                  properties: {
+                    paths: { type: 'object' },
+                    querystrings: { type: 'object' },
+                    headers: { type: 'object' }
+                  }
                 }
               }
             }
           }
+        });
+      } catch (error) {
+        // Schema property already defined, which is fine
+        if (!error.message.includes('already have a definition')) {
+          serverless.cli.log(`Warning: ${error.message}`);
         }
-      });
+      }
     }
 
     this.serverless = serverless;
@@ -178,7 +185,7 @@ class ApiGatewayRequestValidator {
       return;
     }
     
-    const requestParameters = {};
+    const requestParameters = methodResource.Properties.RequestParameters || {};
     
     // Process path parameters
     if (config.parameters.paths) {
